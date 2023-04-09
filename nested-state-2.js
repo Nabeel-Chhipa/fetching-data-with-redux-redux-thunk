@@ -1,47 +1,58 @@
 const redux = require('redux')
+const produce = require('immer').produce
 const reduxLogger = require('redux-logger')
 
-const createStore = redux.createStore
 const applyMiddleware = redux.applyMiddleware
+const createStore = redux.createStore
 const logger = reduxLogger.createLogger()
-
+const bindActionCreators = redux.bindActionCreators
 
 const initialState = {
     name: 'Muhammad Nabeel',
-    age: 27,
+    age: '26',
     address: {
-        area: 'Zaman Town',
-        sector: '35-A',
-        houseNo: 'B/532'
+        houseNo: 'B/532',
+        area: 'Korangi no 4, Zaman Town',
+        sector: '35-A'
     }
 }
 
-const UPDATE_AREA = 'UPDATE_AREA'
+const UPDATE_ADDRESS = 'UPDATE_ADDRESS'
+const UPDATE_HOUSE = 'UPDATE_HOUSE'
 
-const updateAddress = (area) => {
+const updateAddressAction = (area) => {
     return {
-        type: UPDATE_AREA,
+        type: UPDATE_ADDRESS,
         payload: area
     }
 }
+const updateHouseAction = (houseNo) => {
+    return {
+        type: UPDATE_HOUSE,
+        payload: houseNo
+    }
+}
 
-const updateAreaReducer = (state = initialState, action) => {
+const updateAddressReducer = (state = initialState, action) => {
     switch(action.type) {
-        case UPDATE_AREA:
-            return {
-                ...state,
-                address: {
-                    ...state.address,
-                    area: action.payload
-                }
-            }
+        case UPDATE_ADDRESS:
+            return produce(state, (draft) => {
+                draft.address.area = action.payload
+            });
+        case UPDATE_HOUSE:
+            return produce(state, (draft) => {
+                draft.address.houseNo = action.payload
+            });
         default:
             return state
     }
 }
 
-const store = createStore(updateAreaReducer, applyMiddleware(logger))
+const store = createStore(updateAddressReducer, applyMiddleware(logger))
 console.log('Initial State', store.getState())
 const unsubscribe = store.subscribe(() => {})
-store.dispatch(updateAddress('Defence'))
+const actions = bindActionCreators({updateAddressAction, updateHouseAction}, store.dispatch)
+actions.updateAddressAction('Korangi Crossing, Bhitai Colony')
+actions.updateHouseAction('A/012')
+// store.dispatch(updateAddressAction('Korangi Crossing'))
 unsubscribe()

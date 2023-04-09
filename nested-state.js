@@ -1,47 +1,46 @@
-const redux = require('redux')
-const createStore = redux.createStore
-const produce = require('immer').produce
+const redux = require("redux");
+const reduxLogger = require("redux-logger");
+
+const createStore = redux.createStore;
+const applyMiddleware = redux.applyMiddleware;
+const logger = reduxLogger.createLogger();
 
 const initialState = {
-    name: 'Muhammad Nabeel',
-    address: {
-        houseNumber: 'B/532',
-        sector: '35 A',
-        area: 'Zaman Town'
-    }
-}
+  name: "Muhammad Nabeel",
+  age: 27,
+  address: {
+    area: "Zaman Town",
+    sector: "35-A",
+    houseNo: "B/532",
+  },
+};
 
-const AREA_UPDATE = 'AREA_UPDATE'
+const UPDATE_AREA = "UPDATE_AREA";
 
-const updateArea = (area) => {
-    return {
-        type: 'AREA_UPDATE',
-        payload: area
-    }
-}
+const updateAddress = (area) => {
+  return {
+    type: UPDATE_AREA,
+    payload: area,
+  };
+};
 
-const updateAddressReducer = (state = initialState, action) => {
-    switch(action.type) {
-        case AREA_UPDATE:
-            // return {
-            //     ...state,
-            //     address: {
-            //         ...state.address,
-            //         area: action.payload
-            //     }
-            // }
-            return produce(state, (draft) => {
-                draft.address.area = action.payload
-            })
-        default:
-            return state
-    }
-}
+const updateAreaReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case UPDATE_AREA:
+      return {
+        ...state,
+        address: {
+          ...state.address,
+          area: action.payload,
+        },
+      };
+    default:
+      return state;
+  }
+};
 
-const store = createStore(updateAddressReducer)
-console.log('Initial State', store.getState())
-const unsubscribe = store.subscribe(() => {
-    console.log('Updated State', store.getState())
-})
-store.dispatch(updateArea('Gulshan-e-Iqbal'))
-unsubscribe()
+const store = createStore(updateAreaReducer, applyMiddleware(logger));
+console.log("Initial State", store.getState());
+const unsubscribe = store.subscribe(() => {});
+store.dispatch(updateAddress("Defence"));
+unsubscribe();
